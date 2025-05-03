@@ -1,0 +1,330 @@
+/* Main page styling */
+.main {
+    background-color: #f5f7fa;
+}
+
+/* Custom container styles */
+.custom-container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    color: #0f172a;
+}
+
+.custom-container ul li {
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+/* Enhanced Metric card styling with animations */
+.metric-card {
+    background-color: #f1f5f9;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0) 100%);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
+}
+
+.metric-card:hover::before {
+    opacity: 1;
+}
+
+.metric-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #0f172a;
+    margin-bottom: 5px;
+    background: linear-gradient(90deg, #3b82f6, #2dd4bf);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    transform: translateY(20px);
+    opacity: 0;
+    animation: slideUpFadeIn 0.6s forwards 0.2s;
+}
+
+.metric-label {
+    font-size: 15px;
+    color: #64748b;
+    font-weight: 500;
+    transform: translateY(20px);
+    opacity: 0;
+    animation: slideUpFadeIn 0.6s forwards 0.4s;
+}
+
+@keyframes slideUpFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Add a subtle pulse effect to highlight important metrics */
+.metric-card.highlight {
+    animation: metricPulse 2s infinite;
+}
+
+@keyframes metricPulse {
+    0% { box-shadow: 0 4px 15px rgba(59, 130, 246, 0.05); }
+    50% { box-shadow: 0 4px 25px rgba(59, 130, 246, 0.3); }
+    100% { box-shadow: 0 4px 15px rgba(59, 130, 246, 0.05); }
+}
+
+/* Button styling */
+.stButton>button {
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 500;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.stButton>button:hover {
+    background-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Custom header */
+.custom-header {
+    background: linear-gradient(90deg, #3b82f6, #2dd4bf);
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Chart styling */
+.custom-chart {
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Tab styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 24px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background-color: transparent;
+    border-radius: 4px 4px 0px 0px;
+    border: none;
+    color: #4b5563;
+    padding: 10px 16px;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: white !important;
+    color: #3b82f6 !important;
+    border-bottom: 2px solid #3b82f6;
+    font-weight: bold;
+}
+
+/* Slider styling */
+.stSlider [data-baseweb="slider"] {
+    height: 6px;
+}
+
+.stSlider [data-baseweb="slider"] [data-testid="stThumbValue"] {
+    background-color: #3b82f6;
+    border: 2px solid white;
+}
+
+/* Select box styling */
+.stSelectbox [data-baseweb="select"] {
+    border-radius: 8px;
+}
+
+/* Model comparison table */
+.comparison-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.comparison-table th {
+    background-color: #3b82f6;
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.comparison-table tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+.comparison-table tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.comparison-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Dark mode styles */
+.dark-mode .main {
+    background-color: #0f172a;
+    color: #f1f5f9;
+}
+
+.dark-mode .custom-container {
+    background-color: #1e293b;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    color: #f1f5f9;
+}
+
+.dark-mode .metric-card {
+    background-color: #1e293b;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .metric-value {
+    color: #f1f5f9;
+    background: linear-gradient(90deg, #60a5fa, #5eead4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.dark-mode .metric-label {
+    color: #94a3b8;
+}
+
+.dark-mode .stButton>button {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.dark-mode .stButton>button:hover {
+    background-color: #2563eb;
+}
+
+.dark-mode .custom-chart {
+    background-color: #1e293b;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .stTabs [data-baseweb="tab"] {
+    color: #94a3b8;
+}
+
+.dark-mode .stTabs [aria-selected="true"] {
+    background-color: #1e293b !important;
+    color: #60a5fa !important;
+    border-bottom: 2px solid #60a5fa;
+}
+
+.dark-mode .comparison-table th {
+    background-color: #3b82f6;
+}
+
+.dark-mode .comparison-table tr:nth-child(even) {
+    background-color: #1e293b;
+}
+
+.dark-mode .comparison-table tr:nth-child(odd) {
+    background-color: #0f172a;
+}
+
+.dark-mode .comparison-table td {
+    border-bottom: 1px solid #334155;
+}
+
+/* Enhanced Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-20px); }
+    60% { transform: translateY(-10px); }
+}
+
+.fade-in {
+    animation: fadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scale-in {
+    animation: scaleIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.bounce {
+    animation: bounce 1s ease infinite;
+}
+
+/* Staggered animations for lists */
+.staggered-item:nth-child(1) { animation-delay: 0.1s; }
+.staggered-item:nth-child(2) { animation-delay: 0.2s; }
+.staggered-item:nth-child(3) { animation-delay: 0.3s; }
+.staggered-item:nth-child(4) { animation-delay: 0.4s; }
+.staggered-item:nth-child(5) { animation-delay: 0.5s; }
+.staggered-item:nth-child(6) { animation-delay: 0.6s; }
+
+/* Progress bar */
+.stProgress > div > div > div > div {
+    background-color: #3b82f6;
+}
+
+/* Dark mode progress bar */
+.dark-mode .stProgress > div > div > div > div {
+    background-color: #60a5fa;
+}
