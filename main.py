@@ -1,4 +1,13 @@
 import streamlit as st
+
+# Set page configuration - must be the first Streamlit command
+st.set_page_config(
+    page_title="SmartFolio AI - Advanced Stock Portfolio Management",
+    page_icon="💼",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,8 +21,6 @@ import tensorflow as tf
 # from tensorflow.keras.models import load_model
 import torch
 import io
-  
-
 
 
 import json
@@ -27,7 +34,7 @@ from streamlit_card import card
 from streamlit_extras.metric_cards import style_metric_cards
 from streamlit_extras.chart_container import chart_container
 # from streamlit_extras.add_vertical_space import add_vertical_space
-from streamlit_toggle import st_toggle_switch
+from streamlit_toggle import toggle
 from streamlit_extras.colored_header import colored_header
 from streamlit_extras.stoggle import stoggle
 from streamlit_option_menu import option_menu
@@ -62,13 +69,6 @@ def find_column(df, name):
     
     return None
 
-# Set page configuration
-st.set_page_config(
-    page_title="StockVision AI - Advanced Stock Price Prediction",
-    page_icon="ðŸ“ˆ",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # CSS styling
 def local_css(file_name):
@@ -92,31 +92,88 @@ except:
         padding: 20px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
-    }
-    
-    /* Metric card styling */
-    .metric-card {
-        background-color: #f1f5f9;
-        border-radius: 8px;
-        padding: 15px;
-        text-align: center;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        transition: transform 0.3s ease;
-    }
-    
-    .metric-card:hover {
-        transform: translateY(-5px);
-    }
-    
-    .metric-value {
-        font-size: 24px;
-        font-weight: bold;
         color: #0f172a;
     }
     
+    .custom-container ul li {
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+    
+    /* Enhanced Metric card styling with animations */
+    .metric-card {
+        background-color: #f1f5f9;
+        border-radius: 12px;
+        padding: 18px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0) 100%);
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
+    }
+    
+    .metric-card:hover::before {
+        opacity: 1;
+    }
+    
+    .metric-value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #0f172a;
+        margin-bottom: 5px;
+        background: linear-gradient(90deg, #3b82f6, #2dd4bf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+        transform: translateY(20px);
+        opacity: 0;
+        animation: slideUpFadeIn 0.6s forwards 0.2s;
+    }
+    
     .metric-label {
-        font-size: 14px;
+        font-size: 15px;
         color: #64748b;
+        font-weight: 500;
+        transform: translateY(20px);
+        opacity: 0;
+        animation: slideUpFadeIn 0.6s forwards 0.4s;
+    }
+    
+    @keyframes slideUpFadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Add a subtle pulse effect to highlight important metrics */
+    .metric-card.highlight {
+        animation: metricPulse 2s infinite;
+    }
+    
+    @keyframes metricPulse {
+        0% { box-shadow: 0 4px 15px rgba(59, 130, 246, 0.05); }
+        50% { box-shadow: 0 4px 25px rgba(59, 130, 246, 0.3); }
+        100% { box-shadow: 0 4px 15px rgba(59, 130, 246, 0.05); }
     }
     
     /* Button styling */
@@ -221,15 +278,60 @@ except:
         border-bottom: 1px solid #e2e8f0;
     }
     
-    /* Animation */
+    /* Enhanced Animations */
     @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideInLeft {
+        from { opacity: 0; transform: translateX(-30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
+    @keyframes scaleIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-20px); }
+        60% { transform: translateY(-10px); }
     }
     
     .fade-in {
-        animation: fadeIn 0.5s ease-in;
+        animation: fadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     }
+    
+    .slide-in-left {
+        animation: slideInLeft 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    
+    .slide-in-right {
+        animation: slideInRight 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    
+    .scale-in {
+        animation: scaleIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    
+    .bounce {
+        animation: bounce 1s ease infinite;
+    }
+    
+    /* Staggered animations for lists */
+    .staggered-item:nth-child(1) { animation-delay: 0.1s; }
+    .staggered-item:nth-child(2) { animation-delay: 0.2s; }
+    .staggered-item:nth-child(3) { animation-delay: 0.3s; }
+    .staggered-item:nth-child(4) { animation-delay: 0.4s; }
+    .staggered-item:nth-child(5) { animation-delay: 0.5s; }
+    .staggered-item:nth-child(6) { animation-delay: 0.6s; }
     
     /* Progress bar */
     .stProgress > div > div > div > div {
@@ -251,13 +353,125 @@ def load_lottieurl(url: str):
         print(f"Error loading Lottie animation: {e}")
         return None
 
-# Example:
+# Enhanced Lottie animations with more dynamic options
 lottie_stocks = load_lottieurl("https://assets10.lottiefiles.com/packages/lf20_u4yrau.json")
 lottie_analysis = load_lottieurl("https://assets3.lottiefiles.com/packages/lf20_0apkn3k1.json")
 lottie_prediction = load_lottieurl("https://assets5.lottiefiles.com/packages/lf20_UJjaUv.json")
+lottie_chart = load_lottieurl("https://assets9.lottiefiles.com/packages/lf20_l4xxtfd3.json")
+lottie_success = load_lottieurl("https://assets5.lottiefiles.com/packages/lf20_jR229a.json")
 
-# Function to apply theme
+# Add CSS for Lottie animation containers
+st.markdown("""
+<style>
+/* Enhanced Lottie animation container */
+.lottie-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    transform: perspective(1000px) rotateY(0deg);
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    margin: 10px 0;
+}
+
+.lottie-container:hover {
+    transform: perspective(1000px) rotateY(5deg) translateY(-10px);
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.15);
+}
+
+/* Lottie animation entrance */
+@keyframes lottieEntrance {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(30px);
+    }
+    70% {
+        opacity: 0.7;
+        transform: scale(1.05) translateY(-5px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.lottie-entrance {
+    animation: lottieEntrance 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+/* Floating animation for continuous movement */
+@keyframes floating {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.lottie-float {
+    animation: floating 4s ease-in-out infinite;
+}
+
+/* Pulse animation for attention */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.lottie-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Glow effect for dark mode */
+.dark-mode .lottie-container {
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+}
+
+.dark-mode .lottie-container:hover {
+    box-shadow: 0 20px 35px rgba(59, 130, 246, 0.3);
+}
+</style>
+""", unsafe_allow_html=True)
+
+# Function to apply theme with enhanced transitions
 def apply_theme(dark_mode=False):
+    # Add transition animation for theme change
+    st.markdown("""
+    <style>
+    /* Global transition for theme change */
+    * {
+        transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease !important;
+    }
+    
+    /* Theme change animation */
+    @keyframes themeTransition {
+        0% { filter: saturate(0) brightness(1); }
+        50% { filter: saturate(0.5) brightness(0.8); }
+        100% { filter: saturate(1) brightness(1); }
+    }
+    
+    .streamlit-container {
+        animation: themeTransition 0.8s ease forwards;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Add or remove dark-mode class to body
+    if dark_mode:
+        st.markdown("""
+        <script>
+            document.body.classList.add('dark-mode');
+        </script>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <script>
+            document.body.classList.remove('dark-mode');
+        </script>
+        """, unsafe_allow_html=True)
+    
     if dark_mode:
         # Dark mode CSS
         st.markdown("""
@@ -438,6 +652,12 @@ def apply_theme(dark_mode=False):
             background-color: #ffffff;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
+            color: #0f172a;
+        }
+        
+        .custom-container ul li {
+            color: #0f172a;
+            margin-bottom: 8px;
         }
         
         /* Cards */
@@ -643,8 +863,9 @@ st.markdown("""
 
 # Navigation
 with st.sidebar:
-    st.image("https://www.svgrepo.com/show/483222/stock-market.svg", width=120)
-    st.title("StockVision AI")
+    # Use a URL for the logo image
+    st.image("images/logo/smartfolio_logo.png", width=120)
+    st.title("SmartFolio AI")
     st.markdown("---")
     
     selected = option_menu(
@@ -657,69 +878,310 @@ with st.sidebar:
     
     st.markdown("---")
     
-    # Theme toggle with animated icons
+    # Enhanced Theme toggle with animated icons
     st.markdown("""
     <style>
     .theme-toggle-container {
         display: flex;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
     }
     
+    /* Improved theme icons with 3D effects */
     .theme-icon {
-        font-size: 24px;
-        margin-right: 10px;
-        transition: transform 0.5s ease, opacity 0.5s ease;
+        font-size: 28px;
+        margin-right: 15px;
+        transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        transform-origin: center;
+    }
+    
+    .theme-icon:hover {
+        transform: scale(1.2) rotate(15deg);
     }
     
     .theme-icon.sun {
         color: #f59e0b;
+        text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
     }
     
     .theme-icon.moon {
-        color: #6366f1;
+        color: #818cf8;
+        text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+    
+    /* Custom toggle switch styling */
+    .theme-toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+        margin-right: 10px;
+    }
+    
+    .theme-toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .theme-toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #e2e8f0;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        border-radius: 34px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .theme-toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    input:checked + .theme-toggle-slider {
+        background-color: #3b82f6;
+    }
+    
+    input:checked + .theme-toggle-slider:before {
+        transform: translateX(30px);
+    }
+    
+    .theme-toggle-slider:hover {
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    input:checked + .theme-toggle-slider:hover:before {
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
     }
     
     .theme-label {
         font-weight: 500;
-        transition: color 0.3s ease;
+        transition: all 0.3s ease;
+        margin-left: 10px;
+        user-select: none;
     }
     
-    /* Animation for icon switch */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
+    /* Enhanced animations */
+    @keyframes sunRise {
+        0% { opacity: 0; transform: translateY(10px) scale(0.8); }
+        50% { opacity: 0.8; transform: translateY(-5px) scale(1.1); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
     }
     
-    .fade-in {
-        animation: fadeIn 0.5s ease forwards;
+    @keyframes moonRise {
+        0% { opacity: 0; transform: translateY(10px) scale(0.8) rotate(-30deg); }
+        50% { opacity: 0.8; transform: translateY(-5px) scale(1.1) rotate(15deg); }
+        100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+    }
+    
+    .sun-animation {
+        animation: sunRise 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    }
+    
+    .moon-animation {
+        animation: moonRise 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    }
+    
+    /* Theme transition overlay */
+    .theme-transition-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.3);
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .theme-transition-active {
+        opacity: 1;
+    }
+    
+    /* Fix for Streamlit iframe structure */
+    iframe {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Ensure overlay covers the entire viewport */
+    body {
+        overflow-x: hidden;
     }
     </style>
+    
+    <!-- Theme transition overlay -->
+    <div id="themeTransitionOverlay" class="theme-transition-overlay"></div>
+    
+    <script>
+    // Function to animate theme transition
+    function animateThemeTransition() {
+        const overlay = document.getElementById('themeTransitionOverlay');
+        if (overlay) {
+            overlay.classList.add('theme-transition-active');
+            setTimeout(() => {
+                overlay.classList.remove('theme-transition-active');
+            }, 500);
+        }
+    }
+    
+    // Add event listener to toggle switch
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            const toggleSwitch = document.querySelector('.theme-toggle-switch input');
+            if (toggleSwitch) {
+                toggleSwitch.addEventListener('change', animateThemeTransition);
+            }
+        }, 1000);
+    });
+    </script>
     """, unsafe_allow_html=True)
     
-    col_theme1, col_theme2 = st.columns([1, 3])
+    col_theme1, col_theme2 = st.columns([1, 5])
     
     with col_theme1:
         if st.session_state.dark_mode:
             st.markdown("""
-            <div class="theme-icon moon fade-in">
+            <div class="theme-icon moon moon-animation">
                 <span>🌙</span>
             </div>
             """, unsafe_allow_html=True)
         else:
             st.markdown("""
-            <div class="theme-icon sun fade-in">
+            <div class="theme-icon sun sun-animation">
                 <span>☀️</span>
             </div>
             """, unsafe_allow_html=True)
     
     with col_theme2:
-        dark_mode = st_toggle_switch(
+        # Add custom styling for the toggle
+        st.markdown("""
+        <style>
+        /* Style the Streamlit toggle to look like our custom design */
+        .stToggle {
+            transform: scale(1.2);
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Style the toggle track */
+        .stToggle > div > div {
+            background-color: #e2e8f0 !important;
+            border-radius: 34px !important;
+            height: 24px !important;
+            width: 48px !important;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        /* Style the toggle knob */
+        .stToggle > div > div > div {
+            background-color: white !important;
+            border-radius: 50% !important;
+            height: 18px !important;
+            width: 18px !important;
+            margin: 3px !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
+        }
+        
+        /* Style the active toggle */
+        .stToggle > div[data-baseweb="checkbox"] > div[data-checked="true"] {
+            background-color: #3b82f6 !important;
+        }
+        
+        /* Move the knob when checked */
+        .stToggle > div[data-baseweb="checkbox"] > div[data-checked="true"] > div {
+            transform: translateX(24px) !important;
+        }
+        
+        /* Add hover effects */
+        .stToggle > div > div:hover {
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        /* Add glow effect on hover when checked */
+        .stToggle > div[data-baseweb="checkbox"] > div[data-checked="true"]:hover > div {
+            box-shadow: 0 0 8px 2px rgba(59, 130, 246, 0.4) !important;
+        }
+        
+        /* Style the toggle label */
+        .stToggle label {
+            font-weight: 500 !important;
+            margin-left: 10px !important;
+            color: var(--text-color, #0f172a) !important;
+            font-size: 16px !important;
+        }
+        
+        
+        /* Dark mode adjustments */
+        .dark-mode .stToggle label {
+            color: #f1f5f9 !important;
+        }
+        
+        /* Add animation to the toggle */
+        @keyframes togglePulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+        
+        .stToggle > div[data-baseweb="checkbox"] > div[data-checked="true"] > div {
+            animation: togglePulse 1.5s ease-in-out 1;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Use the Streamlit toggle with our custom styling
+        dark_mode = toggle(
             label="Dark Mode",
             key="switch_1",
-            default_value=st.session_state.dark_mode,
-            label_after=True
+            value=st.session_state.dark_mode
         )
+        
+        # Add JavaScript for theme transition effect
+        st.markdown("""
+        <div id="themeTransitionOverlay" class="theme-transition-overlay"></div>
+        
+        <script>
+        // Function to animate theme transition
+        function animateThemeTransition() {
+            const overlay = document.getElementById('themeTransitionOverlay');
+            if (overlay) {
+                overlay.classList.add('theme-transition-active');
+                setTimeout(() => {
+                    overlay.classList.remove('theme-transition-active');
+                }, 500);
+            }
+        }
+        
+        // Add event listener to toggle switch
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const toggleSwitch = document.querySelector('.stToggle input[type="checkbox"]');
+                if (toggleSwitch) {
+                    toggleSwitch.addEventListener('change', animateThemeTransition);
+                }
+            }, 1000);
+        });
+        </script>
+        """, unsafe_allow_html=True)
     
     if dark_mode != st.session_state.dark_mode:
         st.session_state.dark_mode = dark_mode
@@ -728,19 +1190,28 @@ with st.sidebar:
     
     # Footer
     st.sidebar.markdown("---")
-    st.sidebar.caption("Â© 2025 StockVision AI")
+    st.sidebar.caption("© 2025 SmartFolio AI")
     st.sidebar.caption("Powered by Streamlit")
 
 # Home page
 if selected == "Home":
+    # Logo and title at the top
+    col_logo, col_title = st.columns([1, 4])
+    with col_logo:
+        st.image("images/logo/smartfolio_logo.png", width=100)
+    with col_title:
+        st.markdown("<h1 style='font-size:2.5em; margin-top:15px;'>SmartFolio AI</h1>", unsafe_allow_html=True)
+    
+    st.markdown("<hr style='margin-bottom:30px;'>", unsafe_allow_html=True)
+    
     # Header with animation
     col1, col2 = st.columns([2, 1])
     with col1:
-        st.markdown("<h1 style='font-size:3em;'>Welcome to StockVision AI</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size:1.5em;'>Advanced Stock Price Prediction with AI</p>", unsafe_allow_html=True)
+        st.markdown("<h1 style='font-size:3em;'>Welcome to SmartFolio AI</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:1.5em;'>Advanced Stock Portfolio Management with AI</p>", unsafe_allow_html=True)
         st.markdown(
             """
-            StockVision AI leverages cutting-edge time series models and transformer architectures to predict stock prices with high accuracy.
+            SmartFolio AI leverages cutting-edge time series models and transformer architectures to help you manage your investment portfolio with confidence and precision.
             """
         )
         
@@ -764,14 +1235,14 @@ if selected == "Home":
 
     
     with col2:
-        if lottie_stocks:
-            st_lottie(lottie_stocks, height=300, key="stocks_animation")
-        else:
-            st.image("https://www.svgrepo.com/show/483222/stock-market.svg", width=300)
+        # Display the project logo
+        st.markdown('<div class="logo-container" style="display: flex; justify-content: center; align-items: center; height: 100%;">', unsafe_allow_html=True)
+        st.image("images/logo/smartfolio_logo.png", width=300)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     # Feature highlights
     st.markdown("---")
-    st.markdown("<h2 style='text-align: center;'>Features</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #0f172a;'>Features</h2>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     
@@ -779,8 +1250,8 @@ if selected == "Home":
         with st.container():
             st.markdown("""
             <div class='custom-container'>
-                <h3 style='text-align: center;'>Advanced Models</h3>
-                <ul>
+                <h3 style='text-align: center; color: #0f172a;'>Advanced Models</h3>
+                <ul style='color: #0f172a;'>
                     <li>LSTM & BiLSTM Networks</li>
                     <li>GRU Architecture</li>
                     <li>Transformer Models</li>
@@ -793,8 +1264,8 @@ if selected == "Home":
         with st.container():
             st.markdown("""
             <div class='custom-container'>
-                <h3 style='text-align: center;'>Interactive Analysis</h3>
-                <ul>
+                <h3 style='text-align: center; color: #0f172a;'>Interactive Analysis</h3>
+                <ul style='color: #0f172a;'>
                     <li>Historical Data Visualization</li>
                     <li>Technical Indicators</li>
                     <li>Model Performance Metrics</li>
@@ -807,8 +1278,8 @@ if selected == "Home":
         with st.container():
             st.markdown("""
             <div class='custom-container'>
-                <h3 style='text-align: center;'>User-Friendly</h3>
-                <ul>
+                <h3 style='text-align: center; color: #0f172a;'>User-Friendly</h3>
+                <ul style='color: #0f172a;'>
                     <li>Intuitive Interface</li>
                     <li>Easy Model Training</li>
                     <li>Custom Prediction Horizon</li>
@@ -877,6 +1348,15 @@ if selected == "Home":
 
 # Data Explorer page
 elif selected == "Data Explorer":
+    # Logo and title at the top
+    col_logo, col_title = st.columns([1, 4])
+    with col_logo:
+        st.image("images/logo/smartfolio_logo.png", width=100)
+    with col_title:
+        st.markdown("<h1 style='font-size:2.5em; margin-top:15px;'>SmartFolio AI</h1>", unsafe_allow_html=True)
+    
+    st.markdown("<hr style='margin-bottom:30px;'>", unsafe_allow_html=True)
+    
     colored_header(
         label="Data Explorer",
         description="Load and analyze stock data",
@@ -1077,12 +1557,7 @@ elif selected == "Data Explorer":
                 st.error("The loaded data is empty. Please try loading data again.")
                 st.stop()
             
-            # Show actual column names for debugging
-            st.write("Actual column names in the data:", list(df.columns))
-                
             # Find columns by case-insensitive matching
-            col_mapping = {}
-            
             # Map standard column names
             col_mapping = {
                 'date': find_column(df, 'date'),
@@ -1093,32 +1568,13 @@ elif selected == "Data Explorer":
                 'volume': find_column(df, 'volume')
             }
             
-            st.write("Mapped column names:", col_mapping)
-            
             # Check for missing required columns
             missing_cols = [name for name, col in col_mapping.items() if col is None]
             
             if missing_cols:
                 st.warning(f"Missing columns in data: {', '.join(missing_cols)}. Some visualizations may not work.")
             
-            # Debug information
-            with st.expander("Debug Information"):
-                st.write("DataFrame Info:")
-                buffer = io.StringIO()
-                df.info(buf=buffer)
-                st.text(buffer.getvalue())
-                
-                st.write("DataFrame Head:")
-                st.dataframe(df.head())
-                
-                st.write("DataFrame Shape:", df.shape)
-                st.write("DataFrame Columns:", df.columns.tolist())
-                
-                # Check for NaN values
-                nan_counts = df.isna().sum()
-                if nan_counts.sum() > 0:
-                    st.write("NaN Values Count:")
-                    st.dataframe(pd.DataFrame({'Column': nan_counts.index, 'NaN Count': nan_counts.values}))
+
         except Exception as e:
             st.error(f"Error processing data: {str(e)}")
             st.warning("Please try loading the data again.")
@@ -1177,6 +1633,7 @@ elif selected == "Data Explorer":
                 )
             )
             
+            # Display the chart
             st.plotly_chart(fig, use_container_width=True)
             
             # Volume chart
@@ -1498,6 +1955,15 @@ elif selected == "Data Explorer":
 
 # Model Training page
 elif selected == "Model Training":
+    # Logo and title at the top
+    col_logo, col_title = st.columns([1, 4])
+    with col_logo:
+        st.image("images/logo/smartfolio_logo.png", width=100)
+    with col_title:
+        st.markdown("<h1 style='font-size:2.5em; margin-top:15px;'>SmartFolio AI</h1>", unsafe_allow_html=True)
+    
+    st.markdown("<hr style='margin-bottom:30px;'>", unsafe_allow_html=True)
+    
     colored_header(
         label="Model Training",
         description="Train various deep learning models on your stock data",
@@ -1701,6 +2167,15 @@ elif selected == "Model Training":
 
 # Prediction page
 elif selected == "Prediction":
+    # Logo and title at the top
+    col_logo, col_title = st.columns([1, 4])
+    with col_logo:
+        st.image("images/logo/smartfolio_logo.png", width=100)
+    with col_title:
+        st.markdown("<h1 style='font-size:2.5em; margin-top:15px;'>SmartFolio AI</h1>", unsafe_allow_html=True)
+    
+    st.markdown("<hr style='margin-bottom:30px;'>", unsafe_allow_html=True)
+    
     colored_header(
         label="Stock Price Prediction",
         description="Make predictions using trained models",
@@ -1881,6 +2356,15 @@ elif selected == "Prediction":
 
 # Model Comparison page
 elif selected == "Model Comparison":
+    # Logo and title at the top
+    col_logo, col_title = st.columns([1, 4])
+    with col_logo:
+        st.image("images/logo/smartfolio_logo.png", width=100)
+    with col_title:
+        st.markdown("<h1 style='font-size:2.5em; margin-top:15px;'>SmartFolio AI</h1>", unsafe_allow_html=True)
+    
+    st.markdown("<hr style='margin-bottom:30px;'>", unsafe_allow_html=True)
+    
     colored_header(
         label="Model Comparison",
         description="Compare the performance of different prediction models",
@@ -2063,13 +2547,22 @@ elif selected == "Model Comparison":
 
 # About page
 elif selected == "About":
+    # Logo and title at the top
+    col_logo, col_title = st.columns([1, 4])
+    with col_logo:
+        st.image("images/logo/smartfolio_logo.png", width=100)
+    with col_title:
+        st.markdown("<h1 style='font-size:2.5em; margin-top:15px;'>SmartFolio AI</h1>", unsafe_allow_html=True)
+    
+    st.markdown("<hr style='margin-bottom:30px;'>", unsafe_allow_html=True)
+    
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.markdown("<h1 style='font-size:2.5em;'>About StockVision AI</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='font-size:2.5em;'>About SmartFolio AI</h1>", unsafe_allow_html=True)
         st.markdown(
             """
-            StockVision AI is an advanced financial analytics platform that uses cutting-edge deep learning techniques to predict stock prices. 
+            SmartFolio AI is an advanced portfolio management platform that uses cutting-edge deep learning techniques to analyze stocks and optimize investment decisions. 
             
             ### Our Technology
             
@@ -2091,15 +2584,15 @@ elif selected == "About":
             
             ### Data Sources
             
-            StockVision AI uses Yahoo Finance API to fetch historical stock data. Users can also upload their own CSV files.
+            SmartFolio AI uses Yahoo Finance API to fetch historical stock data. Users can also upload their own CSV files.
             """
         )
     
     with col2:
-        if lottie_analysis:
-            st_lottie(lottie_analysis, height=300, key="analysis_animation")
-        else:
-            st.image("https://www.svgrepo.com/show/483083/stock-market.svg", width=300)
+        # Display the project logo
+        st.markdown('<div class="logo-container" style="display: flex; justify-content: center; align-items: center; height: 100%;">', unsafe_allow_html=True)
+        st.image("images/logo/smartfolio_logo.png", width=300)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -2109,7 +2602,7 @@ elif selected == "About":
         st.markdown("### Disclaimer")
         st.info(
             """
-            The predictions provided by StockVision AI are for informational purposes only and should not be construed as financial advice. 
+            The predictions provided by SmartFolio AI are for informational purposes only and should not be construed as financial advice. 
             Stock markets are subject to numerous factors that cannot be fully captured by any predictive model. 
             Always consult with a qualified financial advisor before making investment decisions.
             """
@@ -2129,11 +2622,11 @@ elif selected == "About":
     
     st.markdown("---")
     
-    # Team section with animated header
+    # Creator section with animated header
     st.markdown("""
     <div style="text-align: center; margin-bottom: 30px; animation: fadeInUp 0.8s ease-out;">
-        <h2 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; background: linear-gradient(90deg, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Our Team</h2>
-        <p style="font-size: 1.2rem; opacity: 0.8;">The brilliant minds behind StockVision AI</p>
+        <h2 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; background: linear-gradient(90deg, #3b82f6, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Creator</h2>
+        <p style="font-size: 1.2rem; opacity: 0.8;">The mind behind SmartFolio AI</p>
     </div>
     
     <style>
@@ -2148,7 +2641,7 @@ elif selected == "About":
         }
     }
     
-    /* Add animation for team cards */
+    /* Add animation for creator card */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
@@ -2156,11 +2649,11 @@ elif selected == "About":
     </style>
     """, unsafe_allow_html=True)
     
-    # Custom CSS for team cards with dark mode support and animations
-    team_css = """
+    # Custom CSS for creator card with dark mode support and animations
+    creator_css = """
     <style>
     /* Light mode styles (default) */
-    .team-card {
+    .creator-card {
         background-color: #ffffff;
         border-radius: 12px;
         padding: 20px;
@@ -2175,24 +2668,16 @@ elif selected == "About":
         opacity: 0;
     }
     
-    .team-card:nth-child(1) {
+    .creator-card {
         animation-delay: 0.2s;
     }
     
-    .team-card:nth-child(2) {
-        animation-delay: 0.4s;
-    }
-    
-    .team-card:nth-child(3) {
-        animation-delay: 0.6s;
-    }
-    
-    .team-card:hover {
+    .creator-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
     }
     
-    .team-image {
+    .creator-image {
         width: 150px;
         height: 150px;
         border-radius: 50%;
@@ -2207,21 +2692,21 @@ elif selected == "About":
         border-color: #2563eb;
     }
     
-    .team-name {
+    .creator-name {
         font-size: 1.5rem;
         font-weight: 600;
         margin-bottom: 5px;
         color: #0f172a;
     }
     
-    .team-role {
+    .creator-role {
         font-size: 1.1rem;
         color: #3b82f6;
         margin-bottom: 10px;
         font-weight: 500;
     }
     
-    .team-bio {
+    .creator-bio {
         font-size: 0.95rem;
         color: #64748b;
         line-height: 1.5;
@@ -2244,33 +2729,21 @@ elif selected == "About":
         color: #2563eb;
     }
     
-    /* Animation keyframes */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
     /* Dark mode styles */
-    .dark-mode .team-card {
+    .dark-mode .creator-card {
         background-color: #1e293b;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
     
-    .dark-mode .team-card:hover {
+    .dark-mode .creator-card:hover {
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
     }
     
-    .dark-mode .team-name {
+    .dark-mode .creator-name {
         color: #f1f5f9;
     }
     
-    .dark-mode .team-bio {
+    .dark-mode .creator-bio {
         color: #94a3b8;
     }
     
@@ -2287,17 +2760,14 @@ elif selected == "About":
     # Apply dark mode styles if enabled
     if st.session_state.dark_mode:
         # Add !important to ensure styles override any other styles
-        team_css = team_css.replace('.team-card {', '.team-card { background-color: #1e293b !important;')
-        team_css = team_css.replace('.team-name {', '.team-name { color: #f1f5f9 !important;')
-        team_css = team_css.replace('.team-bio {', '.team-bio { color: #94a3b8 !important;')
+        creator_css = creator_css.replace('.creator-card {', '.creator-card { background-color: #1e293b !important;')
+        creator_css = creator_css.replace('.creator-name {', '.creator-name { color: #f1f5f9 !important;')
+        creator_css = creator_css.replace('.creator-bio {', '.creator-bio { color: #94a3b8 !important;')
         # Add dark mode class to the body for reference
-        team_css = team_css + "\nbody { background-color: #0f172a; }"
+        creator_css = creator_css + "\nbody { background-color: #0f172a; }"
     
-    st.markdown(team_css, unsafe_allow_html=True)
+    st.markdown(creator_css, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
-    
-from team_cards import display_team_cards
-
-# Then call the function where needed
-display_team_cards()
+    # Display creator card in the About page
+    from creator_card import display_creator_card
+    display_creator_card()
