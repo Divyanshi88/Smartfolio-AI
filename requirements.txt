@@ -9,7 +9,4 @@ scikit-learn==1.3.0
 requests==2.31.0
 pillow==10.0.0
 altair==5.0.1
-
-# Optional (use only if actively used in your code)
 streamlit-option-menu==0.3.6
-streamlit-lottie==0.0.5
